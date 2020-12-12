@@ -9,7 +9,6 @@ setup(
     author='Binod Thapa-Chhetry',
     author_email='binod.thapachhetry@gmail.com',
     license='unlicense',
-    # packages=['SWaN'],
-    zip_safe=False,
-    packages=setuptools.find_packages()
+    packages=['SWaN','SWaN_pack'],
+    zip_safe=False
 )
