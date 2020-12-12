@@ -1,3 +1,4 @@
+import setuptools
 from setuptools import setup
 
 setup(
@@ -8,6 +9,7 @@ setup(
     author='Binod Thapa-Chhetry',
     author_email='binod.thapachhetry@gmail.com',
     license='unlicense',
-    packages=['SWaN'],
-    zip_safe=False
+    # packages=['SWaN'],
+    zip_safe=False,
+    packages=setuptools.find_packages()
 )
