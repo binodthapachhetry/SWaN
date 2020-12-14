@@ -776,20 +776,20 @@ def get_feature_sleep(tdf, sampling):
     return result_axes
 
 
-def main():
-    len_args = len(sys.argv)
-    if len_args < 4:
-        print("Syntax error. It should be one of these formats:\n"
-              "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPATN_ID/FILE_PATH_WITH_PARTICIPANT_ID\n"
-              "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD\n "
-              "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD YYYY_MM_DD\n")
-        return
+def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,stopdateStr=None):
+    # len_args = len(sys.argv)
+    # if len_args < 4:
+    #     print("Syntax error. It should be one of these formats:\n"
+    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPATN_ID/FILE_PATH_WITH_PARTICIPANT_ID\n"
+    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD\n "
+    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD YYYY_MM_DD\n")
+    #     return
 
-    if (len_args == 4):
+    if (startdateStr is None) and (stopdateStr is None):
         print("doing for all dates")
-        sampling_rate = int(sys.argv[1])
-        input_folder = sys.argv[2]
-        file_path = sys.argv[3]
+        # sampling_rate = int(sys.argv[1])
+        # input_folder = sys.argv[2]
+        # file_path = sys.argv[3]
         if not (file_path.endswith('.txt')):
             pid = file_path + "@timestudy_com"
             sub_folder = os.path.join(input_folder, pid)
@@ -849,12 +849,13 @@ def main():
 
         return
 
-    if len_args == 5:
-        print("doing for a specific date")
-        sampling_rate = int(sys.argv[1])
-        input_folder = sys.argv[2]
-        file_path = sys.argv[3]
-        dateStr = sys.argv[4]
+    if (startdateStr) and (stopdateStr is None):
+        dateStr = startdateStr
+        # print("doing for a specific date")
+        # sampling_rate = int(sys.argv[1])
+        # input_folder = sys.argv[2]
+        # file_path = sys.argv[3]
+        # dateStr = sys.argv[4]
 
         if not (file_path.endswith('.txt')):
             pid = file_path + "@timestudy_com"
@@ -904,14 +905,14 @@ def main():
 
         return
 
-    if len_args == 6:
+    if (startdateStr and stopdateStr):
         print("doing for a date range")
 
-        sampling_rate = int(sys.argv[1])
-        input_folder = sys.argv[2]
-        file_path = sys.argv[3]
-        startdateStr = sys.argv[4]
-        stopdateStr = sys.argv[5]
+        # sampling_rate = int(sys.argv[1])
+        # input_folder = sys.argv[2]
+        # file_path = sys.argv[3]
+        # startdateStr = sys.argv[4]
+        # stopdateStr = sys.argv[5]
 
         if not (file_path.endswith('.txt')):
             pid = file_path + "@timestudy_com"
@@ -962,5 +963,5 @@ def main():
             correctPredictions(sub_folder, startdateStr, stopdateStr, sampling_rate=sampling_rate)
             print("Done filtering predictions.")
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
