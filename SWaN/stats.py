@@ -1,4 +1,4 @@
-from SWaN_pack.utils import *
+from utils import *
 import scipy.stats as scipy_stats
 
 def mean(X):

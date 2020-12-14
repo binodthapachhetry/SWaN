@@ -1,5 +1,5 @@
 import numpy as np
-from SWaN_pack.utils import *
+from utils import *
 
 
 def active_perc(X, threshold=0.2):

@@ -7,10 +7,13 @@ import numpy as np
 from datetime import timedelta
 from io import StringIO
 
-from SWaN_pack import utils
-from SWaN_pack import config
-from SWaN_pack import feature_set
+# from SWaN_pack import utils
+# from SWaN_pack import config
+# from SWaN_pack import feature_set
 
+import config
+import utils
+import feature_set
 pd.options.mode.chained_assignment = None  # default='warn'
 
 # JAR = 'jar/readBinaryFile.jar'
