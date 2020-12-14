@@ -9,6 +9,6 @@ setup(
     author='Binod Thapa-Chhetry',
     author_email='binod.thapachhetry@gmail.com',
     license='unlicense',
-    packages=['SWaN','SWaN_pack'],
+    packages=['SWaN'],
     zip_safe=False
 )
