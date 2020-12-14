@@ -1,9 +1,8 @@
 winSize = 30
 samplingRate = 80
-scalePath = 'model/StandardScalar_all_data.sav'
-modelPath = 'model/LogisticRegression_all_data_F1score_0.70.sav'
+scalePath = 'StandardScalar_all_data.sav'
+modelPath = 'LogisticRegression_all_data_F1score_0.70.sav'
 
-oriChangePath = 'model/ori_change_use.csv'
 timeString = 'HEADER_TIME_STAMP'
 
 # feature_lis = ['X_DOMFREQ','Y_DOMFREQ','Z_DOMFREQ', 'X_DOMFREQ_POWER','Y_DOMFREQ_POWER','Z_DOMFREQ_POWER',
