@@ -1,9 +1,9 @@
 winSize = 30
 samplingRate = 80
-scalePath = 'SWaN_pack/model/StandardScalar_all_data.sav'
-modelPath = 'SWaN_pack/model/LogisticRegression_all_data_F1score_0.70.sav'
+scalePath = 'model/StandardScalar_all_data.sav'
+modelPath = 'model/LogisticRegression_all_data_F1score_0.70.sav'
 
-oriChangePath = 'SWaN_pack/model/ori_change_use.csv'
+oriChangePath = 'model/ori_change_use.csv'
 timeString = 'HEADER_TIME_STAMP'
 
 # feature_lis = ['X_DOMFREQ','Y_DOMFREQ','Z_DOMFREQ', 'X_DOMFREQ_POWER','Y_DOMFREQ_POWER','Z_DOMFREQ_POWER',

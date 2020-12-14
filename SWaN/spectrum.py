@@ -6,8 +6,8 @@ Frequency features
 """
 from scipy import signal, interpolate
 import numpy as np
-import SWaN_pack.detect_peaks as detect_peaks
-from SWaN_pack.utils import *
+import detect_peaks as detect_peaks
+from utils import *
 
 class FrequencyFeature:
     def __init__(self, X, sr, freq_range=None):
