@@ -8,7 +8,7 @@ Date: Jul 10, 2018
 """
 import numpy as np
 from numpy.linalg import norm
-from utils import *
+from SWaN.utils import *
 from math import *
 
 class OrientationFeature:
