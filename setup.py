@@ -10,5 +10,6 @@ setup(
     author_email='binod.thapachhetry@gmail.com',
     license='unlicense',
     packages= setuptools.find_packages(),
-    zip_safe=False
+    zip_safe=False,
+    install_requires=['scikit-learn==0.22.2.post1','pandas==1.1.3','scipy==1.5.2','numpy==1.19.2']
 )
