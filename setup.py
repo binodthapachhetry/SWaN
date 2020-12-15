@@ -11,5 +11,7 @@ setup(
     license='unlicense',
     packages= setuptools.find_packages(),
     zip_safe=False,
-    install_requires=['scikit-learn==0.22.2.post1']
+    install_requires=['scikit-learn==0.22.2.post1'],
+    package_data={'SWaN':['StandardScalar_all_data.sav','LogisticRegression_all_data_F1score_0.70.sav']},
+    include_package_data=True
 )
