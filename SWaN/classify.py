@@ -705,17 +705,17 @@ def readBinary(inFile):
 
 
 def get_daywise_prediction_df(inFolder, sampling_rate=80):
-    # try:
-    #     import importlib.resources as pkg_resources
-    # except ImportError:
-    #     # Try backported to PY<37 `importlib_resources`.
-    #     import importlib_resources as pkg_resources
+    try:
+        import importlib.resources as pkg_resources
+    except ImportError:
+        # Try backported to PY<37 `importlib_resources`.
+        import importlib_resources as pkg_resources
 
-    trainedModel = pickle.load(open(config.modelPath, "rb"))
-    standardScalar = pickle.load(open(config.scalePath, "rb"))
+    # trainedModel = pickle.load(open(config.modelPath, "rb"))
+    # standardScalar = pickle.load(open(config.scalePath, "rb"))
 
-    # trainedModel = pickle.load(pkg_resources.open_binary(__package__,config.modelPath))
-    # standardScalar = pickle.load(pkg_resources.open_binary(__package__,config.scalePath))
+    trainedModel = pickle.load(pkg_resources.open_binary(__package__,config.modelPath))
+    standardScalar = pickle.load(pkg_resources.open_binary(__package__,config.scalePath))
 
 
     final_day_df = pd.DataFrame()
