@@ -788,6 +788,13 @@ def get_feature_sleep(tdf, sampling):
 
 
 def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,stopdateStr=None):
+# def main():
+#     sampling_rate = int(sys.argv[1])
+#     input_folder = sys.argv[2]
+#     file_path = sys.argv[3]
+#     startdateStr = sys.argv[4]
+#     stopdateStr = None
+
     # len_args = len(sys.argv)
     # if len_args < 4:
     #     print("Syntax error. It should be one of these formats:\n"
