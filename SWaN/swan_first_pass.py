@@ -17,9 +17,9 @@ def get_feature_sleep(tdf, sampling):
     return result_axes
 
 
-def main(df=None, file_path=None,sampling_rate=None, windowsize_sec=None):
+def main(df=None, file_path=None,sampling_rate=None):
 
-    if(df is None) or (file_path is None) or (sampling_rate is None) or (windowsize_sec is None):
+    if(df is None) or (file_path is None) or (sampling_rate is None):
         print("One or all input arguments missing.")
         return
 
@@ -35,7 +35,7 @@ def main(df=None, file_path=None,sampling_rate=None, windowsize_sec=None):
     trainedModel = pickle.load(pkg_resources.open_binary(__package__,config.modelPath))
     standardScalar = pickle.load(pkg_resources.open_binary(__package__,config.scalePath))
 
-    time_grouper = pd.Grouper(key='HEADER_TIME_STAMP', freq=windowsize_sec)
+    time_grouper = pd.Grouper(key='HEADER_TIME_STAMP', freq='30s')
     grouped_df = df.groupby(time_grouper)
 
     print("Computing features...")
