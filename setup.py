@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='SWaN for TIME project',
-    version='0.6',
+    version='0.7',
     description='SWaN package from private bitbucket repo',
     url='git@bitbucket.org:mhealthresearchgroup/packageswanfortime.git',
     author='Binod Thapa-Chhetry',
