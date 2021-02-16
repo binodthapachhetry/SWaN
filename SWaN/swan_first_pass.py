@@ -67,7 +67,7 @@ def main(df=None, file_path=None,sampling_rate=None):
     final_feature_df['PROB_SLEEP'] = prediction_prob[:, 1]
     final_feature_df['PROB_NWEAR'] = prediction_prob[:, 2]
 
-    final_feature_df.to_csv(file_path, index=False, float_format="%.3f")
+    final_feature_df.to_csv(file_path, index=False, float_format="%.3f", compression='infer')
     print("Created prediction file:" + file_path)
 
     return
