@@ -568,7 +568,7 @@ def correctPredictionsSingleDate(folder, dStr):
         print('No prediction data in the folder: '+folder +' for data: ' + dStr)
         return
 
-    outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_final.csv.gz')
+    outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_final.csv')
 
     oriDF.replace({'PREDICTED': {2: 1}}, inplace=True)
     oriDF['PREDICTED_SMOOTH'] = None
@@ -636,7 +636,7 @@ def main(day_folder=None):
     inFold = tmp_tup[0]
     dateSt = tmp_tup[1]
 
-    if(os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv.gz'))):
+    if(os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv'))):
         print("Second pass output file aleady exists.")
         return
 
