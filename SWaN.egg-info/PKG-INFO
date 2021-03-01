@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: SWaN
+Version: 0.8
+Summary: A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.
+Home-page: git@bitbucket.org:mhealthresearchgroup/packageswanfortime.git
+Author: Binod Thapa Chhetry
+Author-email: binod.thapachhetry@gmail.com
+License: UNKNOWN
+Description: # SWaN package
+        
+        This is an algorithm to distinguish sleep-wear, wake-wear, and non-wear in an accelerometer dataset. 
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
