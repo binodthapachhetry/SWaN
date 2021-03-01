@@ -2,7 +2,7 @@ Metadata-Version: 2.1
 Name: SWaN
 Version: 0.8
 Summary: A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.
-Home-page: git@bitbucket.org:mhealthresearchgroup/packageswanfortime.git
+Home-page: https://bitbucket.org/mhealthresearchgroup/packageswanfortime.git
 Author: Binod Thapa Chhetry
 Author-email: binod.thapachhetry@gmail.com
 License: UNKNOWN

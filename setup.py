@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="SWaN",
     version="0.8",
-    author="Binod Thapa Chhetry",
+    author="binodtc",
     author_email="binod.thapachhetry@gmail.com",
     description="A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.",
     url="https://bitbucket.org/mhealthresearchgroup/packageswanfortime.git",
