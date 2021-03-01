@@ -1,32 +1,17 @@
-import os, gzip, pickle, sys, datetime, struct
+import os, datetime
 from glob import glob
 import pandas as pd
-import subprocess
-import shutil
+
 import numpy as np
 from datetime import timedelta
-from io import StringIO
 
-from SWaN-accel import config
-from SWaN-accel import utils
-from SWaN-accel import feature_set
 pd.options.mode.chained_assignment = None  # default='warn'
-
-# JAR = 'jar/readBinaryFile.jar'
-
-# col = ["HEADER_TIME_STAMP","X","Y","Z"]
-
-col = ["HEADER_TIME_STAMP","X_ACCELERATION_METERS_PER_SECOND_SQUARED",
-       "Y_ACCELERATION_METERS_PER_SECOND_SQUARED","Z_ACCELERATION_METERS_PER_SECOND_SQUARED"]
-
-MHEALTH_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 PROB_WEAR = 'PROB_WEAR'
 PROB_SLEEP = 'PROB_SLEEP'
 PROB_NWEAR = 'PROB_NWEAR'
 
-ori_header = ['ORI_X_MEDIAN', 'ORI_Y_MEDIAN', 'ORI_Z_MEDIAN']
-
+MHEALTH_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def mhealth_timestamp_parser(val):
     return datetime.datetime.strptime(val, MHEALTH_TIMESTAMP_FORMAT)
@@ -540,7 +525,7 @@ def daterange(date1, date2):
     for n in range(int((date2 - date1).days) + 1):
         yield date1 + timedelta(n)
 
-def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
+def correctPredictionsSingleDate(folder, dStr):
     dObj = datetime.datetime.strptime(dStr, "%Y-%m-%d")
 
     prev = dObj - datetime.timedelta(days=1)
@@ -551,41 +536,30 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
 
     oriDF = pd.DataFrame(data=None)
 
-    prevFolder = os.path.join(folder, 'data-watch', prevStr)
-    if os.path.isdir(prevFolder):
-        daily_feature_file = os.path.join(prevFolder,"SWaN-accel_" + prevStr+"_dailyfeatures.csv")
-        if(os.path.isfile(daily_feature_file)):
-            odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
-                                  parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
-        else:
-            odf = get_daywise_prediction_df(prevFolder, sampling_rate)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
+    prevFolder = os.path.join(folder, prevStr)
+    for feature_file in sorted(glob(os.path.join(prevFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+        odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
+                          parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
+                          date_parser=mhealth_timestamp_parser)
+        oriDF = pd.concat([oriDF, odf], ignore_index=True)
 
-    thisFolder = os.path.join(folder, 'data-watch', dStr)
-    if os.path.isdir(thisFolder):
-        daily_feature_file = os.path.join(thisFolder, "SWaN-accel_" + dStr + "_dailyfeatures.csv")
-        if (os.path.isfile(daily_feature_file)):
-            odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
-                              parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
-        else:
-            odf = get_daywise_prediction_df(thisFolder, sampling_rate)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
 
-    nextFolder = os.path.join(folder, 'data-watch', nextStr)
-    if os.path.isdir(nextFolder):
-        daily_feature_file = os.path.join(nextFolder, "SWaN-accel_" + nextStr + "_dailyfeatures.csv")
-        if (os.path.isfile(daily_feature_file)):
-            odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
-                              parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
-        else:
-            odf = get_daywise_prediction_df(nextFolder, sampling_rate)
-            oriDF = pd.concat([oriDF, odf], ignore_index=True)
+    thisFolder = os.path.join(folder, dStr)
+    for feature_file in sorted(glob(os.path.join(thisFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+        odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
+                          parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
+                          date_parser=mhealth_timestamp_parser)
+        oriDF = pd.concat([oriDF, odf], ignore_index=True)
+
+    nextFolder = os.path.join(folder, nextStr)
+    for feature_file in sorted(glob(os.path.join(nextFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+        odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
+                          parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
+                          date_parser=mhealth_timestamp_parser)
+        oriDF = pd.concat([oriDF, odf], ignore_index=True)
 
     if oriDF.empty:
-        print("No data found for this day or previous and next day.")
+        print("No data found for this day or previous and the following day.")
         return
 
     oriDF.sort_values(by='HEADER_TIME_STAMP', inplace=True)
@@ -594,7 +568,7 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
         print('No prediction data in the folder: '+folder +' for data: ' + dStr)
         return
 
-    outPath = os.path.join(folder, 'data-watch', dStr, 'SWaN-accel_' + dStr + '_final.csv')
+    outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_final.csv')
 
     oriDF.replace({'PREDICTED': {2: 1}}, inplace=True)
     oriDF['PREDICTED_SMOOTH'] = None
@@ -647,339 +621,24 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
         ['HEADER_TIME_STAMP', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
     print(datetime.datetime.now().strftime("%H:%M:%S") + " Finished performing rule-based filtering.")
 
-    final_df.to_csv(outPath, index=False, float_format='%.3f')
+    final_df.to_csv(outPath, index=False, float_format='%.3f', compression='infer')
 
-def correctPredictions(folder, startdStr, stopdStr, sampling_rate=80):
-    startdObj = datetime.datetime.strptime(startdStr, "%Y-%m-%d")
-    stopdObj = datetime.datetime.strptime(stopdStr, "%Y-%m-%d")
-
-    # prev = startdObj - datetime.timedelta(days=1)
-    # next = stopdObj + datetime.timedelta(days=1)
-
-    prev = startdObj
-    next = stopdObj
-
-    pid = os.path.basename(folder)
-
-    for dt in daterange(prev, next):
-        dStr = dt.strftime("%Y-%m-%d")
-
-        refPath = os.path.join(folder, 'data-watch', dStr, 'SWaN-accel_' + dStr + '_final.csv')
-
-        if not os.path.exists(refPath):
-            print("Performing rule-based filtering for participant: " + pid + " for date: " + dStr)
-            correctPredictionsSingleDate(folder, dStr, sampling_rate=sampling_rate)
-            print("Done rule-based filtering for participant: " + pid + " for date: " + dStr)
-        else:
-            print("Final rule-based filtered file present for participant: " + pid + " for date " + dStr)
-
-def readBinary(inFile):
-    tz = os.path.basename(inFile).split('.')[2].split('-')[-1]
-
-    hourdiff = int(tz[1:3])
-    minutediff = int(tz[3:])
-
-    if (tz[0] == 'M'):
-        hourdiff = -int(tz[1:3])
-        minutediff = -int(tz[3:])
-
-    file = open(inFile, "rb")
-    b = file.read(20)
-    diction = {}
-    i = 0
-    while len(b) >= 20:
-        t = int.from_bytes(b[0:8], byteorder='big')
-        x = struct.unpack('>f', b[8:12])[0]
-        y = struct.unpack('>f', b[12:16])[0]
-        z = struct.unpack('>f', b[16:20])[0]
-        diction[i] = {'time': t, 'x': x, 'y': y, 'z': z}
-        i = i + 1
-
-        b = file.read(20)
-
-    df = pd.DataFrame.from_dict(diction, "index")
-    df.columns = col
-    df['HEADER_TIME_STAMP'] = pd.to_datetime(df['HEADER_TIME_STAMP'], unit='ms') + \
-                              datetime.timedelta(hours=hourdiff) + datetime.timedelta(minutes=minutediff)
-    return df
-
-
-def get_daywise_prediction_df(inFolder, sampling_rate=80):
-    try:
-        import importlib.resources as pkg_resources
-    except ImportError:
-        # Try backported to PY<37 `importlib_resources`.
-        import importlib_resources as pkg_resources
-
-    # trainedModel = pickle.load(open(config.modelPath, "rb"))
-    # standardScalar = pickle.load(open(config.scalePath, "rb"))
-
-    trainedModel = pickle.load(pkg_resources.open_binary(__package__,config.modelPath))
-    standardScalar = pickle.load(pkg_resources.open_binary(__package__,config.scalePath))
-
-
-    final_day_df = pd.DataFrame()
-    for file in sorted(
-            glob(os.path.join(inFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.sensor.baf'))):
-        outfilePath = os.path.join(os.path.dirname(file),
-                                   ".".join(os.path.basename(file).split('.')[1:-2]) + ".prediction.csv")
-        if os.path.exists(outfilePath):
-            print(outfilePath + " present. Reading that file.")
-            odf = pd.read_csv(outfilePath, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
-                              parse_dates=[0], date_parser=mhealth_timestamp_parser)
-            final_day_df = pd.concat([final_day_df, odf], ignore_index=True)
-            continue
-
-        print(datetime.datetime.now().strftime("%H:%M:%S") + ' Reading binary file :' + file)
-
-        try:
-            df = readBinary(file)
-        except:
-            print('Issue with converting baf file to a dataframe - ' + file)
-            continue
-
-        print(datetime.datetime.now().strftime("%H:%M:%S") + ' Computing feature set for :' + file)
-
-        time_grouper = pd.Grouper(key='HEADER_TIME_STAMP', freq='30s')
-        grouped_df = df.groupby(time_grouper)
-
-
-        feature_df = pd.DataFrame()
-        for name, group in grouped_df:
-            if len(group) > sampling_rate * 15:
-                op = get_feature_sleep(group, sampling_rate)
-                op['HEADER_TIME_STAMP'] = name
-                feature_df = pd.concat([feature_df, op], ignore_index=True)
-
-        final_feature_df = feature_df.dropna(how='any', axis=0, inplace=False)
-        if final_feature_df.empty:
-            print("No feature row computed or remaining after dropping zero rows. So not moving to prediction.")
-            continue
-
-        final_feature_df.rename(columns={'HEADER_TIME_STAMP': 'START_TIME'}, inplace=True)
-        final_feature_df['HEADER_TIME_STAMP'] = final_feature_df['START_TIME']
-        final_feature_df['STOP_TIME'] = final_feature_df['START_TIME'] + pd.Timedelta(seconds=30)
-
-        print(datetime.datetime.now().strftime("%H:%M:%S") + " Performing window-level classification for :" + file)
-        final_feature_df = final_feature_df.dropna()
-        subfdata = final_feature_df[config.feature_lis]
-        sfdata = standardScalar.transform(subfdata)
-        prediction_prob = trainedModel.predict_proba(sfdata)
-        prediction = np.argmax(prediction_prob, axis=1)
-        p = prediction.reshape((-1, 1))
-        final_feature_df["PREDICTED"] = p
-        final_feature_df['PROB_WEAR'] = prediction_prob[:, 0]
-        final_feature_df['PROB_SLEEP'] = prediction_prob[:, 1]
-        final_feature_df['PROB_NWEAR'] = prediction_prob[:, 2]
-
-        final_day_df = pd.concat([final_day_df, final_feature_df], ignore_index=True)
-
-    dateStr = os.path.basename(inFolder)
-    outPath = os.path.join(inFolder, "SWaN-accel_" + dateStr + "_dailyfeatures.csv")
-
-    final_day_df.to_csv(outPath, index=False, float_format="%.3f")
-    print("Created prediction file:" + outPath)
-    return final_day_df
-
-def get_feature_sleep(tdf, sampling):
-    X_axes = utils.as_float64(tdf.values[:, 1:])
-    result_axes = feature_set.compute_extra_features(X_axes, sampling)
-    return result_axes
-
-
-def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,stopdateStr=None):
-# def main():
-#     sampling_rate = int(sys.argv[1])
-#     input_folder = sys.argv[2]
-#     file_path = sys.argv[3]
-#     startdateStr = sys.argv[4]
-#     stopdateStr = None
-
-    # len_args = len(sys.argv)
-    # if len_args < 4:
-    #     print("Syntax error. It should be one of these formats:\n"
-    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPATN_ID/FILE_PATH_WITH_PARTICIPANT_ID\n"
-    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD\n "
-    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD YYYY_MM_DD\n")
-    #     return
-
-    if (startdateStr is None) and (stopdateStr is None):
-        print("doing for all dates")
-        # sampling_rate = int(sys.argv[1])
-        # input_folder = sys.argv[2]
-        # file_path = sys.argv[3]
-        if not (file_path.endswith('.txt')):
-            pid = file_path + "@timestudy_com"
-            sub_folder = os.path.join(input_folder, pid)
-            final_input_folder = os.path.join(input_folder, pid)
-
-            date_lis = [os.path.basename(x) for x in glob(os.path.join(final_input_folder, 'data-watch', '*'))]
-
-            for dateStr in date_lis:
-                final_input_folder = os.path.join(input_folder, pid, 'data-watch', dateStr)
-
-                if not os.path.isdir(final_input_folder):
-                    print("Missing folder: " + final_input_folder)
-                    continue
-
-                refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
-
-                if not os.path.exists(refPath):
-                    print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
-                    correctPredictionsSingleDate(sub_folder, dateStr, sampling_rate=sampling_rate)
-                    print("Done filtering predictions.")
-                else:
-                    print("Final rule-based filtered file present.")
-
-            return
-
-        if not (os.path.isfile(file_path)):
-            print("File with participant ids does not exist")
-            return
-
-        with open(file_path) as f:
-            content = f.readlines()
-        pidLis = [x.strip() for x in content]
-
-        for pid in pidLis:
-            pid = pid + "@timestudy_com"
-
-            sub_folder = os.path.join(input_folder, pid)
-            final_input_folder = os.path.join(input_folder, pid)
-
-            date_lis = [os.path.basename(x) for x in glob(os.path.join(final_input_folder, 'data-watch', '*'))]
-
-            for dateStr in date_lis:
-                final_input_folder = os.path.join(input_folder, pid, 'data-watch', dateStr)
-
-                if not os.path.isdir(final_input_folder):
-                    print("Missing folder: " + final_input_folder)
-                    continue
-
-                refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
-
-                if not os.path.exists(refPath):
-                    print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
-                    correctPredictionsSingleDate(sub_folder, dateStr, sampling_rate=sampling_rate)
-                    print("Done filtering predictions.")
-                else:
-                    print("Final rule-based filtered file present.")
-
+def main(day_folder=None):
+    if (day_folder is None):
+        print("Must enter day folder path.")
         return
 
-    if (startdateStr) and (stopdateStr is None):
-        dateStr = startdateStr
-        # print("doing for a specific date")
-        # sampling_rate = int(sys.argv[1])
-        # input_folder = sys.argv[2]
-        # file_path = sys.argv[3]
-        # dateStr = sys.argv[4]
-
-        if not (file_path.endswith('.txt')):
-            pid = file_path + "@timestudy_com"
-            sub_folder = os.path.join(input_folder, pid)
-            final_input_folder = os.path.join(input_folder, pid, 'data-watch', dateStr)
-
-            if not os.path.isdir(final_input_folder):
-                print("Missing folder: " + final_input_folder)
-                return
-
-            refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
-
-            if not os.path.exists(refPath):
-                print(datetime.datetime.now().strftime("%H:%M:%S") + " Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
-                correctPredictionsSingleDate(sub_folder, dateStr, sampling_rate=sampling_rate)
-                print("Done filtering predictions.")
-            else:
-                print("Final rule-based filtered file present " + refPath)
-
-            return
-
-        if not (os.path.isfile(file_path)):
-            print("File with participant ids does not exist")
-            return
-
-        with open(file_path) as f:
-            content = f.readlines()
-        pidLis = [x.strip() for x in content]
-
-        for pid in pidLis:
-            pid = pid + "@timestudy_com"
-            sub_folder = os.path.join(input_folder, pid)
-            final_input_folder = os.path.join(input_folder, pid, 'data-watch', dateStr)
-
-            if not os.path.isdir(final_input_folder):
-                print("Missing folder: " + final_input_folder)
-                continue
-
-            refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
-
-            if not os.path.exists(refPath):
-                print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
-                correctPredictionsSingleDate(sub_folder, dateStr, sampling_rate=sampling_rate)
-                print("Done filtering predictions.")
-            else:
-                print("Final rule-based filtered file present.")
-
+    if(not os.path.isdir(day_folder)):
+        print("Folder does not exists.")
         return
 
-    if (startdateStr and stopdateStr):
-        print("doing for a date range")
+    tmp_tup = os.path.split(day_folder)
+    inFold = tmp_tup[0]
+    dateSt = tmp_tup[1]
 
-        # sampling_rate = int(sys.argv[1])
-        # input_folder = sys.argv[2]
-        # file_path = sys.argv[3]
-        # startdateStr = sys.argv[4]
-        # stopdateStr = sys.argv[5]
+    if(os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv'))):
+        print("Second pass output file aleady exists.")
+        return
 
-        if not (file_path.endswith('.txt')):
-            pid = file_path + "@timestudy_com"
-            sub_folder = os.path.join(input_folder, pid)
-            first_input_folder = os.path.join(input_folder, pid, 'data-watch', startdateStr)
+    correctPredictionsSingleDate(inFold,dateSt)
 
-            if not os.path.isdir(first_input_folder):
-                print("Missing folder: " + first_input_folder)
-                return
-
-            last_input_folder = os.path.join(input_folder, pid, 'data-watch', stopdateStr)
-
-            if not os.path.isdir(last_input_folder):
-                print("Missing folder: " + last_input_folder)
-                return
-
-            print(
-                "Performing rule-based filtering for participant: " + pid + " for date between: " + startdateStr + " and " + stopdateStr)
-            correctPredictions(sub_folder, startdateStr, stopdateStr, sampling_rate=sampling_rate)
-            print("Done filtering predictions.")
-
-            return
-
-        if not (os.path.isfile(file_path)):
-            print("File with participant ids does not exist")
-            return
-        with open(file_path) as f:
-            content = f.readlines()
-        pidLis = [x.strip() for x in content]
-
-        for pid in pidLis:
-            pid = pid + "@timestudy_com"
-            sub_folder = os.path.join(input_folder, pid)
-            first_input_folder = os.path.join(input_folder, pid, 'data-watch', startdateStr)
-
-            if not os.path.isdir(first_input_folder):
-                print("Missing folder: " + first_input_folder)
-                continue
-
-            last_input_folder = os.path.join(input_folder, pid, 'data-watch', stopdateStr)
-
-            if not os.path.isdir(last_input_folder):
-                print("Missing folder: " + last_input_folder)
-                continue
-
-            print(
-                "Performing rule-based filtering for participant: " + pid + " for date between: " + startdateStr + " and " + stopdateStr)
-            correctPredictions(sub_folder, startdateStr, stopdateStr, sampling_rate=sampling_rate)
-            print("Done filtering predictions.")
-
-# if __name__ == "__main__":
-#     main()
