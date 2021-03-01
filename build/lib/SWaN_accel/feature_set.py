@@ -1,9 +1,9 @@
-import SWaN-accel.spectrum as spectrum
-import SWaN-accel.orientation as orientation
+import SWaN_accel.spectrum as spectrum
+import SWaN_accel.orientation as orientation
 import pandas as pd
-import SWaN-accel.config as config
-import SWaN-accel.utils as utils
-import SWaN-accel.energy as energy
+import SWaN_accel.config as config
+import SWaN_accel.utils as utils
+import SWaN_accel.energy as energy
 from numpy.linalg import norm
 
 def compute_extra_features(X,sampling):
