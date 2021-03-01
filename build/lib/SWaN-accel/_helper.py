@@ -1,5 +1,5 @@
 import calendar, json, os, sys, time
-from SWaN import _root
+from SWaN-accel import _root
 
 
 

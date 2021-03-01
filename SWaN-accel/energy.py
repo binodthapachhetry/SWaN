@@ -9,7 +9,7 @@ Date: Jul 10, 2018
 """
 import numpy as np
 from numpy.linalg import norm
-from SWaN.utils import *
+from SWaN-accel.utils import *
 
 class EnergyFeature:
     def __init__(self, X, subwins=30):

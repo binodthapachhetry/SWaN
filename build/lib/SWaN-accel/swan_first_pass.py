@@ -2,9 +2,9 @@ import pickle, datetime
 import pandas as pd
 import numpy as np
 
-from SWaN import config
-from SWaN import utils
-from SWaN import feature_set
+from SWaN-accel import config
+from SWaN-accel import utils
+from SWaN-accel import feature_set
 pd.options.mode.chained_assignment = None  # default='warn'
 
 

@@ -7,9 +7,9 @@ import numpy as np
 from datetime import timedelta
 from io import StringIO
 
-from SWaN import config
-from SWaN import utils
-from SWaN import feature_set
+from SWaN-accel import config
+from SWaN-accel import utils
+from SWaN-accel import feature_set
 pd.options.mode.chained_assignment = None  # default='warn'
 
 # JAR = 'jar/readBinaryFile.jar'
@@ -553,7 +553,7 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
 
     prevFolder = os.path.join(folder, 'data-watch', prevStr)
     if os.path.isdir(prevFolder):
-        daily_feature_file = os.path.join(prevFolder,"SWaN_" + prevStr+"_dailyfeatures.csv")
+        daily_feature_file = os.path.join(prevFolder,"SWaN-accel_" + prevStr+"_dailyfeatures.csv")
         if(os.path.isfile(daily_feature_file)):
             odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                                   parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
@@ -564,7 +564,7 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
 
     thisFolder = os.path.join(folder, 'data-watch', dStr)
     if os.path.isdir(thisFolder):
-        daily_feature_file = os.path.join(thisFolder, "SWaN_" + dStr + "_dailyfeatures.csv")
+        daily_feature_file = os.path.join(thisFolder, "SWaN-accel_" + dStr + "_dailyfeatures.csv")
         if (os.path.isfile(daily_feature_file)):
             odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                               parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
@@ -575,7 +575,7 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
 
     nextFolder = os.path.join(folder, 'data-watch', nextStr)
     if os.path.isdir(nextFolder):
-        daily_feature_file = os.path.join(nextFolder, "SWaN_" + nextStr + "_dailyfeatures.csv")
+        daily_feature_file = os.path.join(nextFolder, "SWaN-accel_" + nextStr + "_dailyfeatures.csv")
         if (os.path.isfile(daily_feature_file)):
             odf = pd.read_csv(daily_feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                               parse_dates=['HEADER_TIME_STAMP','START_TIME','STOP_TIME'], date_parser=mhealth_timestamp_parser)
@@ -594,7 +594,7 @@ def correctPredictionsSingleDate(folder, dStr, sampling_rate=80):
         print('No prediction data in the folder: '+folder +' for data: ' + dStr)
         return
 
-    outPath = os.path.join(folder, 'data-watch', dStr, 'SWaN_' + dStr + '_final.csv')
+    outPath = os.path.join(folder, 'data-watch', dStr, 'SWaN-accel_' + dStr + '_final.csv')
 
     oriDF.replace({'PREDICTED': {2: 1}}, inplace=True)
     oriDF['PREDICTED_SMOOTH'] = None
@@ -664,7 +664,7 @@ def correctPredictions(folder, startdStr, stopdStr, sampling_rate=80):
     for dt in daterange(prev, next):
         dStr = dt.strftime("%Y-%m-%d")
 
-        refPath = os.path.join(folder, 'data-watch', dStr, 'SWaN_' + dStr + '_final.csv')
+        refPath = os.path.join(folder, 'data-watch', dStr, 'SWaN-accel_' + dStr + '_final.csv')
 
         if not os.path.exists(refPath):
             print("Performing rule-based filtering for participant: " + pid + " for date: " + dStr)
@@ -775,7 +775,7 @@ def get_daywise_prediction_df(inFolder, sampling_rate=80):
         final_day_df = pd.concat([final_day_df, final_feature_df], ignore_index=True)
 
     dateStr = os.path.basename(inFolder)
-    outPath = os.path.join(inFolder, "SWaN_" + dateStr + "_dailyfeatures.csv")
+    outPath = os.path.join(inFolder, "SWaN-accel_" + dateStr + "_dailyfeatures.csv")
 
     final_day_df.to_csv(outPath, index=False, float_format="%.3f")
     print("Created prediction file:" + outPath)
@@ -798,9 +798,9 @@ def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,s
     # len_args = len(sys.argv)
     # if len_args < 4:
     #     print("Syntax error. It should be one of these formats:\n"
-    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPATN_ID/FILE_PATH_WITH_PARTICIPANT_ID\n"
-    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD\n "
-    #           "python SWaNforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD YYYY_MM_DD\n")
+    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPATN_ID/FILE_PATH_WITH_PARTICIPANT_ID\n"
+    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD\n "
+    #           "python SWaN-accelforTIME_final.py SAMPLING RATE INPUT_FOLDER PARTICIPANT_ID/FILE_PATH_WITH_PARTICIPANT_ID YYYY_MM_DD YYYY_MM_DD\n")
     #     return
 
     if (startdateStr is None) and (stopdateStr is None):
@@ -822,7 +822,7 @@ def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,s
                     print("Missing folder: " + final_input_folder)
                     continue
 
-                refPath = os.path.join(final_input_folder, 'SWaN_' + dateStr + '_final.csv')
+                refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
 
                 if not os.path.exists(refPath):
                     print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
@@ -856,7 +856,7 @@ def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,s
                     print("Missing folder: " + final_input_folder)
                     continue
 
-                refPath = os.path.join(final_input_folder, 'SWaN_' + dateStr + '_final.csv')
+                refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
 
                 if not os.path.exists(refPath):
                     print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
@@ -884,7 +884,7 @@ def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,s
                 print("Missing folder: " + final_input_folder)
                 return
 
-            refPath = os.path.join(final_input_folder, 'SWaN_' + dateStr + '_final.csv')
+            refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
 
             if not os.path.exists(refPath):
                 print(datetime.datetime.now().strftime("%H:%M:%S") + " Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
@@ -912,7 +912,7 @@ def main(sampling_rate=None,input_folder=None,file_path=None,startdateStr=None,s
                 print("Missing folder: " + final_input_folder)
                 continue
 
-            refPath = os.path.join(final_input_folder, 'SWaN_' + dateStr + '_final.csv')
+            refPath = os.path.join(final_input_folder, 'SWaN-accel_' + dateStr + '_final.csv')
 
             if not os.path.exists(refPath):
                 print("Performing rule-based filtering for participant: " + pid + " for date: " + dateStr)
