@@ -1,1 +1,1 @@
-SWaN-accel
+SWaN_accel

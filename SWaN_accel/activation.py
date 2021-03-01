@@ -1,4 +1,4 @@
-from SWaN-accel.utils import *
+from SWaN_accel.utils import *
 
 
 def active_perc(X, threshold=0.2):
