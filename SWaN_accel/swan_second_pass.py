@@ -1,4 +1,4 @@
-import os, datetime
+import os, datetime, sys
 from glob import glob
 import pandas as pd
 
@@ -37,6 +37,7 @@ def contigous_regions_usingOri(condition):
     return this_ar
 
 def contigous_regions(condition):
+    print("here")
     d = np.diff(condition)
     idx, = d.nonzero()
     idx += 1
@@ -57,12 +58,14 @@ def contigous_regions(condition):
     return this_ar
 
 def filterUsingZori(bout_array, fil_df, lab_str, ref_str, prob_wear, prob_sleep, prob_nwear):
-    fdf = fil_df.copy()
-    tmp_fdf = fil_df.copy()
+    o_fdf = fil_df.copy(deep=True)
+    fdf = fil_df.copy(deep=True)
+    tmp_fdf = fil_df.copy(deep=True)
+
     for n in range(len(bout_array)):
-        ar_sub = fdf[bout_array[n][0]:bout_array[n][1] + 1]
+        ar_sub = o_fdf[bout_array[n][0]:bout_array[n][1] + 1]
         ar_sub_pred = ar_sub[lab_str].values[0]
-        ar_sub_start = ar_sub.index[0]
+        ar_sub_start = bout_array[n][0]
         ar_sub_ori = ar_sub[ref_str].values
         bout_array_sub = contigous_regions_usingOri(ar_sub_ori)
         bout_array_sub_final = bout_array_sub + ar_sub_start
@@ -94,9 +97,9 @@ def filterUsingZori(bout_array, fil_df, lab_str, ref_str, prob_wear, prob_sleep,
             elif ar_sub_pred == 2:
                 if start == end:
                     fdf.loc[start, 'PREDICTED_SMOOTH'] = 0
-                    fdf.loc[start, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start][prob_sleep]
-                    fdf.loc[start, 'PROB_SLEEP_SMOOTH'] = tmp_fdf.loc[start][prob_wear]
-                    fdf.loc[start]['PROB_NWEAR_SMOOTH'] = tmp_fdf.loc[start][prob_nwear]
+                    fdf.loc[start, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start][prob_nwear]
+                    fdf.loc[start, 'PROB_SLEEP_SMOOTH'] = tmp_fdf.loc[start][prob_sleep]
+                    fdf.loc[start]['PROB_NWEAR_SMOOTH'] = tmp_fdf.loc[start][prob_wear]
                 else:
                     fdf.loc[start:end, 'PREDICTED_SMOOTH'] = 2
                     fdf.loc[start:end, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start:end][prob_wear]
@@ -563,6 +566,7 @@ def correctPredictionsSingleDate(folder, dStr):
         return
 
     oriDF.sort_values(by='HEADER_TIME_STAMP', inplace=True)
+    oriDF.reset_index(drop=True,inplace=True)
 
     if oriDF.dropna().empty:
         print('No prediction data in the folder: '+folder +' for data: ' + dStr)
@@ -576,6 +580,7 @@ def correctPredictionsSingleDate(folder, dStr):
     oriDF['PROB_SLEEP_SMOOTH'] = None
     oriDF['PROB_NWEAR_SMOOTH'] = None
     tmp_ar = oriDF['PREDICTED'].values
+
 
     # compute contigous bouts based on window-level prediction
     obout_array = contigous_regions(tmp_ar)
@@ -641,4 +646,3 @@ def main(day_folder=None):
         return
 
     correctPredictionsSingleDate(inFold,dateSt)
-
