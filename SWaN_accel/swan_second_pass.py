@@ -1,4 +1,4 @@
-import os, datetime, sys
+import os, datetime
 from glob import glob
 import pandas as pd
 
@@ -37,7 +37,6 @@ def contigous_regions_usingOri(condition):
     return this_ar
 
 def contigous_regions(condition):
-    print("here")
     d = np.diff(condition)
     idx, = d.nonzero()
     idx += 1
@@ -541,6 +540,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     prevFolder = os.path.join(folder, prevStr)
     for feature_file in sorted(glob(os.path.join(prevFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(prevFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -549,6 +550,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     thisFolder = os.path.join(folder, dStr)
     for feature_file in sorted(glob(os.path.join(thisFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(thisFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -556,6 +559,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     nextFolder = os.path.join(folder, nextStr)
     for feature_file in sorted(glob(os.path.join(nextFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(nextFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -622,8 +627,12 @@ def correctPredictionsSingleDate(folder, dStr):
     nextDateObj = currDateObj + datetime.timedelta(days=1)
 
     mask = (oriDF['HEADER_TIME_STAMP'] > currDateObj) & (oriDF['HEADER_TIME_STAMP'] < nextDateObj)
+
     final_df = oriDF.loc[mask][
-        ['HEADER_TIME_STAMP', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
+        ['START_TIME', 'STOP_TIME', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
+    final_df.rename(columns={'PREDICTED_SMOOTH':'PREDICTION'}, inplace=True)
+    final_df['PREDICTION'].replace({0:'Wear',1:'Sleep',2:'Nonwear'}, inplace=True)
+
     print(datetime.datetime.now().strftime("%H:%M:%S") + " Finished performing rule-based filtering.")
 
     final_df.to_csv(outPath, index=False, float_format='%.3f', compression='infer')

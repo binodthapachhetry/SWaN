@@ -1,14 +1,29 @@
 Metadata-Version: 2.1
 Name: SWaN-accel
-Version: 0.9
+Version: 1.2
 Summary: A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.
 Home-page: https://bitbucket.org/mhealthresearchgroup/packageswanfortime.git
 Author: binodtc
 Author-email: binod.thapachhetry@gmail.com
 License: UNKNOWN
-Description: # SWaN package
+Description: # SWaN_accel package
         
-        This is an algorithm to distinguish sleep-wear, wake-wear, and non-wear in an accelerometer dataset. 
+        This is an algorithm to distinguish between sleep-wear, wake-wear, and non-wear in accelerometer dataset. 
+        
+        To install the package, use the following pip command:
+        ### pip install swan_accel
+        
+        To import the two relevant methods from the package, type:
+        ### from SWaN_accel import swan_first_pass, swan_second_pass
+        
+        To run swan first pass algorithm:
+        ### swan_first_pass.main(df=dataframe object, file_path=path for output file,sampling_rate=sampling rate of data)
+        
+        To run swan second pass algorithm
+        ### swan_second_pass.main(day_folder=path of the date folder)
+        
+        
+        
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
