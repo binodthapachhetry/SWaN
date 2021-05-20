@@ -57,12 +57,14 @@ def contigous_regions(condition):
     return this_ar
 
 def filterUsingZori(bout_array, fil_df, lab_str, ref_str, prob_wear, prob_sleep, prob_nwear):
-    fdf = fil_df.copy()
-    tmp_fdf = fil_df.copy()
+    o_fdf = fil_df.copy(deep=True)
+    fdf = fil_df.copy(deep=True)
+    tmp_fdf = fil_df.copy(deep=True)
+
     for n in range(len(bout_array)):
-        ar_sub = fdf[bout_array[n][0]:bout_array[n][1] + 1]
+        ar_sub = o_fdf[bout_array[n][0]:bout_array[n][1] + 1]
         ar_sub_pred = ar_sub[lab_str].values[0]
-        ar_sub_start = ar_sub.index[0]
+        ar_sub_start = bout_array[n][0]
         ar_sub_ori = ar_sub[ref_str].values
         bout_array_sub = contigous_regions_usingOri(ar_sub_ori)
         bout_array_sub_final = bout_array_sub + ar_sub_start
@@ -94,9 +96,9 @@ def filterUsingZori(bout_array, fil_df, lab_str, ref_str, prob_wear, prob_sleep,
             elif ar_sub_pred == 2:
                 if start == end:
                     fdf.loc[start, 'PREDICTED_SMOOTH'] = 0
-                    fdf.loc[start, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start][prob_sleep]
-                    fdf.loc[start, 'PROB_SLEEP_SMOOTH'] = tmp_fdf.loc[start][prob_wear]
-                    fdf.loc[start]['PROB_NWEAR_SMOOTH'] = tmp_fdf.loc[start][prob_nwear]
+                    fdf.loc[start, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start][prob_nwear]
+                    fdf.loc[start, 'PROB_SLEEP_SMOOTH'] = tmp_fdf.loc[start][prob_sleep]
+                    fdf.loc[start]['PROB_NWEAR_SMOOTH'] = tmp_fdf.loc[start][prob_wear]
                 else:
                     fdf.loc[start:end, 'PREDICTED_SMOOTH'] = 2
                     fdf.loc[start:end, 'PROB_WEAR_SMOOTH'] = tmp_fdf.loc[start:end][prob_wear]
@@ -538,6 +540,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     prevFolder = os.path.join(folder, prevStr)
     for feature_file in sorted(glob(os.path.join(prevFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(prevFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -546,6 +550,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     thisFolder = os.path.join(folder, dStr)
     for feature_file in sorted(glob(os.path.join(thisFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(thisFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -553,6 +559,8 @@ def correctPredictionsSingleDate(folder, dStr):
 
     nextFolder = os.path.join(folder, nextStr)
     for feature_file in sorted(glob(os.path.join(nextFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
+    # for feature_file in sorted(glob(os.path.join(nextFolder, '*features.csv'))):
+
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -563,6 +571,7 @@ def correctPredictionsSingleDate(folder, dStr):
         return
 
     oriDF.sort_values(by='HEADER_TIME_STAMP', inplace=True)
+    oriDF.reset_index(drop=True,inplace=True)
 
     if oriDF.dropna().empty:
         print('No prediction data in the folder: '+folder +' for data: ' + dStr)
@@ -576,6 +585,7 @@ def correctPredictionsSingleDate(folder, dStr):
     oriDF['PROB_SLEEP_SMOOTH'] = None
     oriDF['PROB_NWEAR_SMOOTH'] = None
     tmp_ar = oriDF['PREDICTED'].values
+
 
     # compute contigous bouts based on window-level prediction
     obout_array = contigous_regions(tmp_ar)
@@ -617,8 +627,12 @@ def correctPredictionsSingleDate(folder, dStr):
     nextDateObj = currDateObj + datetime.timedelta(days=1)
 
     mask = (oriDF['HEADER_TIME_STAMP'] > currDateObj) & (oriDF['HEADER_TIME_STAMP'] < nextDateObj)
+
     final_df = oriDF.loc[mask][
-        ['HEADER_TIME_STAMP', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
+        ['START_TIME', 'STOP_TIME', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
+    final_df.rename(columns={'PREDICTED_SMOOTH':'PREDICTION'}, inplace=True)
+    final_df['PREDICTION'].replace({0:'Wear',1:'Sleep',2:'Nonwear'}, inplace=True)
+
     print(datetime.datetime.now().strftime("%H:%M:%S") + " Finished performing rule-based filtering.")
 
     final_df.to_csv(outPath, index=False, float_format='%.3f', compression='infer')
@@ -641,4 +655,3 @@ def main(day_folder=None):
         return
 
     correctPredictionsSingleDate(inFold,dateSt)
-
