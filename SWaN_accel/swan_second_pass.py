@@ -540,8 +540,6 @@ def correctPredictionsSingleDate(folder, dStr):
 
     prevFolder = os.path.join(folder, prevStr)
     for feature_file in sorted(glob(os.path.join(prevFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
-    # for feature_file in sorted(glob(os.path.join(prevFolder, '*features.csv'))):
-
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -550,8 +548,6 @@ def correctPredictionsSingleDate(folder, dStr):
 
     thisFolder = os.path.join(folder, dStr)
     for feature_file in sorted(glob(os.path.join(thisFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
-    # for feature_file in sorted(glob(os.path.join(thisFolder, '*features.csv'))):
-
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
@@ -559,8 +555,6 @@ def correctPredictionsSingleDate(folder, dStr):
 
     nextFolder = os.path.join(folder, nextStr)
     for feature_file in sorted(glob(os.path.join(nextFolder, '*/AndroidWearWatch-AccelerationCalibrated-NA.*.feature.csv.gz'))):
-    # for feature_file in sorted(glob(os.path.join(nextFolder, '*features.csv'))):
-
         odf = pd.read_csv(feature_file, header=0, skiprows=0, sep=',', compression="infer", quotechar='"',
                           parse_dates=['HEADER_TIME_STAMP', 'START_TIME', 'STOP_TIME'],
                           date_parser=mhealth_timestamp_parser)
