@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="SWaN_accel",
-    version="1.4",
+    version="1.6",
     author="binodtc",
     author_email="binod.thapachhetry@gmail.com",
     description="A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.",
@@ -19,5 +19,6 @@ setuptools.setup(
     python_requires=">=3.6",
     install_requires=['scikit-learn==0.23.2'],
     package_data={'SWaN_accel':['StandardScalar_all_data.sav','LogisticRegression_all_data_F1score_0.70.sav']},
+
     include_package_data=True
 )

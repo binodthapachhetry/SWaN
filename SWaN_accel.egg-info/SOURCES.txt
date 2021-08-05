@@ -1,8 +1,11 @@
 LICENSE
+MANIFEST.in
 README.md
 pyproject.toml
 setup.cfg
 setup.py
+SWaN_accel/LogisticRegression_all_data_F1score_0.70.sav
+SWaN_accel/StandardScalar_all_data.sav
 SWaN_accel/__init__.py
 SWaN_accel/_helper.py
 SWaN_accel/_root.py
