@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="SWaN_accel",
-    version="1.7",
+    version="1.8",
     author="binodtc",
     author_email="binod.thapachhetry@gmail.com",
     description="A pacakge to classify sleep-wear, wake-wear, and non-wear in accelerometer dataset.",
