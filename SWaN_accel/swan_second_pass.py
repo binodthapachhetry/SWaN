@@ -628,7 +628,7 @@ def correctPredictionsSingleDate(folder, dStr, mode):
     mask = (oriDF['HEADER_TIME_STAMP'] > currDateObj) & (oriDF['HEADER_TIME_STAMP'] < nextDateObj)
 
     if mode == 'Yes':
-        final_df = oriDF.loc
+        final_df = oriDF
     else:
         final_df = oriDF.loc[mask][
             ['START_TIME', 'STOP_TIME', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
