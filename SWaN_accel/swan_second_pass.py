@@ -573,6 +573,11 @@ def correctPredictionsSingleDate(folder, dStr, mode):
 
     outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_final.csv')
 
+    if mode == 'Yes':
+        outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_debug.csv')
+    else:
+        outPath = os.path.join(folder, dStr, 'SWaN_' + dStr + '_final.csv')
+
     oriDF.replace({'PREDICTED': {2: 1}}, inplace=True)
     oriDF['PREDICTED_SMOOTH'] = None
     oriDF['PROB_WEAR_SMOOTH'] = None
@@ -623,7 +628,7 @@ def correctPredictionsSingleDate(folder, dStr, mode):
     mask = (oriDF['HEADER_TIME_STAMP'] > currDateObj) & (oriDF['HEADER_TIME_STAMP'] < nextDateObj)
 
     if mode == 'Yes':
-        final_df = oriDF.loc[mask]
+        final_df = oriDF.loc
     else:
         final_df = oriDF.loc[mask][
             ['START_TIME', 'STOP_TIME', 'PREDICTED_SMOOTH', 'PROB_WEAR_SMOOTH', 'PROB_SLEEP_SMOOTH', 'PROB_NWEAR_SMOOTH']]
@@ -648,7 +653,12 @@ def main(day_folder=None, debug='No'):
     inFold = tmp_tup[0]
     dateSt = tmp_tup[1]
 
-    if(os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv'))):
+    if debug == 'Yes':
+        path = os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_debug.csv'))
+    else:
+        path = os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv'))
+
+    if(os.path.exists(path)):
         print("Second pass output file aleady exists.")
         return
 
