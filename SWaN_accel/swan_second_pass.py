@@ -654,9 +654,9 @@ def main(day_folder=None, debug='No'):
     dateSt = tmp_tup[1]
 
     if debug == 'Yes':
-        path = os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_debug.csv'))
+        path = os.path.join(day_folder,'SWaN_' + dateSt + '_debug.csv')
     else:
-        path = os.path.exists(os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv'))
+        path = os.path.join(day_folder,'SWaN_' + dateSt + '_final.csv')
 
     if(os.path.exists(path)):
         print("Second pass output file aleady exists.")
